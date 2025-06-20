@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Time!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="style.css" rel="stylesheet">
+</head>
+<body class="bg-[#f7f7f7]">
+    <!-- Tela de início -->
+    <div id="start-screen">
+        <h1 class="text-5xl font-extrabold text-[#46178f] mb-6">QUIZ TIME!</h1>
+        <p class="text-gray-600 mb-10 text-xl">Responda rápido e acumule pontos!</p>
+        
+        <div class="mb-10">
+            <h2 class="text-2xl font-bold text-[#46178f] mb-4">Olimpiadas de Básicos</h2>
+            <p class="text-gray-500">10 perguntas • Tempo limitado • Pontuação baseada na velocidade</p>
+        </div>
+        
+        <div class="flex justify-center">
+            <button id="start-btn" class="bg-[#46178f] hover:bg-[#5a1cb8] text-white font-bold py-4 px-12 rounded-full text-xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+                VAMOS JOGAR!
+            </button>
+        </div>
+    </div>
+    
+    <!-- Tela de contagem regressiva -->
+    <div id="countdown-screen" class="hidden flex flex-col items-center justify-center h-[80vh]">
+        <div id="countdown-number" class="text-9xl font-extrabold text-black countdown">3</div>
+    </div>
+    
+    <!-- Tela do jogo -->
+    <div id="game-screen" class="hidden">
+        <div class="flex justify-between items-center mb-6">
+            <div class="bg-white rounded-xl shadow-md p-4 w-32 text-center">
+                <p class="text-gray-600 text-sm">Pergunta</p>
+                <p id="question-counter" class="text-2xl font-bold text-[#46178f]">1/10</p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-4 w-32 text-center">
+                <p class="text-gray-600 text-sm">Pontos</p>
+                <p id="score-display" class="text-2xl font-bold text-[#46178f]">0</p>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-3xl shadow-xl p-8 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <div class="w-full bg-gray-200 rounded-full h-3">
+                    <div id="timer-bar" class="timer-bar bg-[#46178f] h-3 rounded-full" style="width: 100%"></div>
+                </div>
+                <div id="timer-display" class="ml-4 text-xl font-bold text-white bg-[#46178f] rounded-full w-12 h-12 flex items-center justify-center">
+                    20
+                </div>
+            </div>
+            
+            <h2 id="question-text" class="text-2xl font-bold text-gray-800 mb-8 text-center py-4">Qual é a capital do Brasil?</h2>
+            
+            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="option option-red text-white font-bold py-6 px-4 rounded-xl cursor-pointer text-center text-xl shadow-md" data-correct="false">
+                    Rio de Janeiro
+                </div>
+                <div class="option option-blue text-white font-bold py-6 px-4 rounded-xl cursor-pointer text-center text-xl shadow-md" data-correct="true">
+                    Brasília
+                </div>
+                <div class="option option-yellow text-white font-bold py-6 px-4 rounded-xl cursor-pointer text-center text-xl shadow-md" data-correct="false">
+                    São Paulo
+                </div>
+                <div class="option option-green text-white font-bold py-6 px-4 rounded-xl cursor-pointer text-center text-xl shadow-md" data-correct="false">
+                    Salvador
+                </div>
+            </div>
+        </div>
+        
+        <div id="feedback-container" class="hidden bg-white rounded-3xl shadow-xl p-6 text-center mb-6">
+            <div id="answer-feedback" class="text-2xl font-bold mb-2">Correto!</div>
+            <div id="points-earned" class="text-xl">+<span>100</span> pontos</div>
+        </div>
+    </div>
+    
+    <!-- Tela de resultado -->
+    <div id="result-screen" class="hidden bg-white rounded-3xl shadow-xl p-8 text-center">
+        <div id="confetti-container"></div>
+        
+        <h2 class="text-4xl font-extrabold text-[#46178f] mb-6">RESULTADO FINAL</h2>
+        
+        <div class="mb-10">
+            <div class="w-48 h-48 rounded-full bg-[#f2f0f7] flex items-center justify-center mx-auto mb-6">
+                <p id="final-score" class="text-6xl font-extrabold text-[#46178f]">0</p>
+            </div>
+            <p class="text-2xl text-gray-700">pontos totais</p>
+        </div>
+        
+        <div class="mb-10">
+            <p id="correct-answers" class="text-xl text-gray-700 mb-3">Respostas corretas: 0/10</p>
+            <p id="result-message" class="text-2xl font-bold text-[#46178f]">Bom trabalho!</p>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <button id="play-again-btn" class="bg-[#46178f] hover:bg-[#5a1cb8] text-white font-bold py-4 px-10 rounded-full text-xl transition-all duration-300 shadow-lg">
+                JOGAR NOVAMENTE
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="perguntas.js"></script>
+<script>
+    // Variáveis do jogo
+    let currentQuestions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let correctAnswers = 0;
+    let timer;
+    let timeLeft = 20;
+    let maxTimePerQuestion = 20;
+    let answerSelected = false;
+
+    // Elementos DOM
+    const startScreen = document.getElementById('start-screen');
+    const countdownScreen = document.getElementById('countdown-screen');
+    const countdownNumber = document.getElementById('countdown-number');
+    const gameScreen = document.getElementById('game-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const startBtn = document.getElementById('start-btn');
+    const questionCounter = document.getElementById('question-counter');
+    const scoreDisplay = document.getElementById('score-display');
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const timerBar = document.getElementById('timer-bar');
+    const timerDisplay = document.getElementById('timer-display');
+    const feedbackContainer = document.getElementById('feedback-container');
+    const answerFeedback = document.getElementById('answer-feedback');
+    const pointsEarned = document.getElementById('points-earned').querySelector('span');
+    const finalScore = document.getElementById('final-score');
+    const correctAnswersDisplay = document.getElementById('correct-answers');
+    const resultMessage = document.getElementById('result-message');
+    const playAgainBtn = document.getElementById('play-again-btn');
+    const confettiContainer = document.getElementById('confetti-container');
+
+    // Iniciar o jogo
+    startBtn.addEventListener('click', startCountdown);
+    playAgainBtn.addEventListener('click', startCountdown);
+
+    // Função para iniciar a contagem regressiva
+    function startCountdown() {
+        startScreen.classList.add('hidden');
+        resultScreen.classList.add('hidden');
+        countdownScreen.classList.remove('hidden');
+        
+        let count = 3;
+        countdownNumber.textContent = count;
+        
+        const countInterval = setInterval(() => {
+            count--;
+            
+            if (count > 0) {
+                countdownNumber.textContent = count;
+            } else {
+                clearInterval(countInterval);
+                countdownScreen.classList.add('hidden');
+                startGame();
+            }
+        }, 1000);
+    }
+
+    // Função para iniciar o jogo
+    function startGame() {
+        currentQuestions = [...questions];
+        shuffleArray(currentQuestions); // <-- embaralha a ordem das perguntas
+        currentQuestionIndex = 0;
+        score = 0;
+        correctAnswers = 0;
+        
+        gameScreen.classList.remove('hidden');
+        feedbackContainer.classList.add('hidden');
+        
+        loadQuestion();
+    }
+
+    // Função para carregar uma pergunta
+    function loadQuestion() {
+        answerSelected = false;
+        const question = currentQuestions[currentQuestionIndex];
+
+        // Embaralhar opções e atualizar o índice correto
+        shuffleOptions(question);
+
+        questionText.textContent = question.question;
+        
+        // Atualizar contador de perguntas
+        questionCounter.textContent = `${currentQuestionIndex + 1}/${currentQuestions.length}`;
+        
+        // Limpar opções anteriores
+        optionsContainer.innerHTML = '';
+        
+        // Cores para as opções
+        const colors = ['option-red', 'option-blue', 'option-yellow', 'option-green'];
+        
+        // Criar novas opções
+        question.options.forEach((option, index) => {
+            const optionDiv = document.createElement('div');
+            optionDiv.className = `option ${colors[index]} text-white font-bold py-6 px-4 rounded-xl cursor-pointer text-center text-xl shadow-md`;
+            optionDiv.dataset.index = index;
+            optionDiv.dataset.correct = (index === question.correctIndex);
+            optionDiv.textContent = option;
+            
+            optionDiv.addEventListener('click', selectOption);
+            optionsContainer.appendChild(optionDiv);
+        });
+        
+        // Iniciar o temporizador
+        startTimer();
+    }
+
+    // Função para iniciar o temporizador
+    function startTimer() {
+        timeLeft = maxTimePerQuestion;
+        timerDisplay.textContent = timeLeft;
+        timerBar.style.width = '100%';
+        
+        clearInterval(timer);
+        timer = setInterval(() => {
+            timeLeft--;
+            timerDisplay.textContent = timeLeft;
+            timerBar.style.width = `${(timeLeft / maxTimePerQuestion) * 100}%`;
+            
+            if (timeLeft <= 5) {
+                timerDisplay.classList.add('countdown');
+                timerBar.style.backgroundColor = '#e21b3c';
+            } else {
+                timerDisplay.classList.remove('countdown');
+                timerBar.style.backgroundColor = '#46178f';
+            }
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                if (!answerSelected) {
+                    timeOut();
+                }
+            }
+        }, 1000);
+    }
+
+    // Função para quando o tempo acabar
+    function timeOut() {
+        answerSelected = true;
+        
+        // Desabilitar todas as opções
+        const options = document.querySelectorAll('.option');
+        options.forEach(option => {
+            option.classList.add('disabled');
+            
+            if (option.dataset.correct === 'true') {
+                option.classList.add('correct');
+            }
+        });
+        
+        // Mostrar feedback
+        showFeedback(false, 0);
+        
+        // Próxima pergunta após 2 segundos
+        setTimeout(() => {
+            nextQuestion();
+        }, 2000);
+    }
+
+    // Função para selecionar uma opção
+    function selectOption(e) {
+        if (answerSelected) return;
+        
+        answerSelected = true;
+        clearInterval(timer);
+        
+        const selectedOption = e.currentTarget;
+        const isCorrect = selectedOption.dataset.correct === 'true';
+        
+        // Desabilitar todas as opções após a seleção
+        const options = document.querySelectorAll('.option');
+        options.forEach(option => {
+            option.classList.add('disabled');
+            
+            if (option.dataset.correct === 'true') {
+                option.classList.add('correct');
+            }
+        });
+        
+        // Calcular pontos com base no tempo restante
+        let pointsToAdd = 0;
+        
+        if (isCorrect) {
+            selectedOption.classList.add('correct');
+            correctAnswers++;
+            
+            // Pontuação base + bônus por tempo
+            pointsToAdd = 100 + (timeLeft * 10);
+            score += pointsToAdd;
+            scoreDisplay.textContent = score;
+            
+            // Efeito de confete pequeno
+            createConfetti(5);
+        } else {
+            selectedOption.classList.add('incorrect');
+        }
+        
+        // Mostrar feedback
+        showFeedback(isCorrect, pointsToAdd);
+        
+        // Próxima pergunta após 2 segundos
+        setTimeout(() => {
+            nextQuestion();
+        }, 2000);
+    }
+
+    // Função para mostrar feedback
+    function showFeedback(isCorrect, points) {
+        feedbackContainer.classList.remove('hidden');
+        
+        if (isCorrect) {
+            answerFeedback.textContent = 'Correto!';
+            answerFeedback.className = 'text-2xl font-bold mb-2 text-green-600';
+            pointsEarned.textContent = points;
+            pointsEarned.parentElement.classList.add('score-animation');
+        } else {
+            answerFeedback.textContent = 'Incorreto!';
+            answerFeedback.className = 'text-2xl font-bold mb-2 text-red-600';
+            pointsEarned.textContent = '0';
+        }
+        
+        setTimeout(() => {
+            pointsEarned.parentElement.classList.remove('score-animation');
+        }, 500);
+    }
+
+    // Função para ir para a próxima pergunta
+    function nextQuestion() {
+        feedbackContainer.classList.add('hidden');
+        currentQuestionIndex++;
+        
+        if (currentQuestionIndex < currentQuestions.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    // Função para mostrar os resultados
+    function showResults() {
+        gameScreen.classList.add('hidden');
+        resultScreen.classList.remove('hidden');
+        
+        finalScore.textContent = score;
+        correctAnswersDisplay.textContent = `Respostas corretas: ${correctAnswers}/${currentQuestions.length}`;
+        
+        // Definir mensagem com base na pontuação
+        if (correctAnswers === currentQuestions.length) {
+            resultMessage.textContent = 'PERFEITO! VOCÊ É INCRÍVEL!';
+            createConfetti(100);
+        } else if (correctAnswers >= currentQuestions.length * 0.7) {
+            resultMessage.textContent = 'MUITO BOM! QUASE PERFEITO!';
+            createConfetti(50);
+        } else if (correctAnswers >= currentQuestions.length * 0.5) {
+            resultMessage.textContent = 'BOM TRABALHO! CONTINUE PRATICANDO!';
+            createConfetti(20);
+        } else {
+            resultMessage.textContent = 'TENTE NOVAMENTE, VOCÊ CONSEGUE!';
+        }
+    }
+
+    // Função para criar confete
+    function createConfetti(count) {
+        confettiContainer.innerHTML = '';
+        
+        const colors = ['#e21b3c', '#1368ce', '#d89e00', '#26890c', '#46178f'];
+        
+        for (let i = 0; i < count; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = `${Math.random() * 100}%`;
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.width = `${Math.random() * 10 + 5}px`;
+            confetti.style.height = `${Math.random() * 10 + 5}px`;
+            confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+            confetti.style.animationDelay = `${Math.random() * 2}s`;
+            
+            confettiContainer.appendChild(confetti);
+        }
+    }
+
+    // Função para embaralhar array
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    // Função para embaralhar opções e atualizar o índice correto
+    function shuffleOptions(question) {
+        const options = question.options.map((option, idx) => ({
+            text: option,
+            isCorrect: idx === question.correctIndex
+        }));
+        for (let i = options.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [options[i], options[j]] = [options[j], options[i]];
+        }
+        question.options = options.map(opt => opt.text);
+        question.correctIndex = options.findIndex(opt => opt.isCorrect);
+    }
+</script>
+</body>
+</html>
