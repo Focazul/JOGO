@@ -321,12 +321,15 @@
         // Função para mostrar feedback
         function showFeedback(isCorrect, points) {
             feedbackContainer.classList.remove('hidden');
-            
+
+            // Remove classes antigas
+            document.body.classList.remove('bg-happy', 'bg-sad');
+
             // Plateia reage
             if (isCorrect) {
-                document.body.style.backgroundImage = "url('crowd-happy.png')";
+                document.body.classList.add('bg-happy');
             } else {
-                document.body.style.backgroundImage = "url('crowd-sad.png')";
+                document.body.classList.add('bg-sad');
             }
 
             if (isCorrect) {
@@ -339,10 +342,10 @@
                 answerFeedback.className = 'text-2xl font-bold mb-2 text-red-600';
                 pointsEarned.textContent = '0';
             }
-            
+
             setTimeout(() => {
                 pointsEarned.parentElement.classList.remove('score-animation');
-                document.body.style.backgroundImage = "url('crowd-neutral.png')";
+                document.body.classList.remove('bg-happy', 'bg-sad');
             }, 1500);
         }
 
