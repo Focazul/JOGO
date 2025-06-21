@@ -100,3 +100,35 @@ const questions = [
         correctIndex: 1 
     }
 ];
+
+const crowdBg = document.getElementById('crowd-bg');
+
+function showFeedback(isCorrect, points) {
+    feedbackContainer.classList.remove('hidden');
+
+    // Remove classes antigas
+    document.body.classList.remove('bg-happy', 'bg-sad');
+
+    // Plateia reage
+    if (isCorrect) {
+        document.body.classList.add('bg-happy');
+    } else {
+        document.body.classList.add('bg-sad');
+    }
+
+    if (isCorrect) {
+        answerFeedback.textContent = 'Correto!';
+        answerFeedback.className = 'text-2xl font-bold mb-2 text-green-600';
+        pointsEarned.textContent = points;
+        pointsEarned.parentElement.classList.add('score-animation');
+    } else {
+        answerFeedback.textContent = 'Incorreto!';
+        answerFeedback.className = 'text-2xl font-bold mb-2 text-red-600';
+        pointsEarned.textContent = '0';
+    }
+
+    setTimeout(() => {
+        pointsEarned.parentElement.classList.remove('score-animation');
+        document.body.classList.remove('bg-happy', 'bg-sad');
+    }, 1500);
+}
