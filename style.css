@@ -1,39 +1,164 @@
 body {
-    font-family: 'Montserrat', sans-serif;
-    background-color: #46178f;
+    font-family: 'Montserrat', Arial, sans-serif;
+    background-color: #f0f0f0;
+    position: relative;
     min-height: 100vh;
+    margin: 0;
+    padding: 0;
     overflow-x: hidden;
+    transition: background-image 0.5s ease;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: url('crowd-neutral.png') center center / cover no-repeat fixed;
+    opacity: 1;
+    transition: opacity 0.5s;
+    pointer-events: none;
+}
+
+body.bg-happy::before {
+    background-image: url('crowd-happy.png');
+}
+
+body.bg-sad::before {
+    background-image: url('crowd-sad.png');
+}
+
+/* Expanda o conteúdo principal para ocupar mais largura */
+.main-content {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;         /* Ocupa toda a largura da tela */
+    max-width: 100vw;
+    padding: 0;
+    margin: 0;
+}
+
+/* Expanda os quadros do jogo para ficarem mais largos */
+#start-screen, #game-screen, #result-screen, #countdown-screen {
+    max-width: 900px;     /* Aumente conforme desejar */
+    width: 95vw;          /* Quase toda a largura da tela */
+    margin: 32px auto;
+    background: #fff;
+    border-radius: 32px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    padding: 32px 24px;
+    text-align: center;
+    position: relative;
+}
+
+h1, h2 {
+    color: #1976d2;
+    font-weight: 900;
+    margin-bottom: 12px;
+}
+
+#score-display, #final-score {
+    font-size: 2.5rem;
+    color: #ffd600;
+    font-weight: bold;
+    margin: 16px 0;
+    text-shadow: 1px 1px 6px #1976d2;
 }
 
 .option {
-    transition: all 0.3s ease;
-    transform: translateY(0);
+    display: block;
+    margin: 16px auto;
+    padding: 18px 0;
+    border-radius: 18px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #fff;
+    background: #1976d2;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    border: none;
+    width: 90%;
+    max-width: 340px;
 }
 
-.option:hover {
-    transform: translateY(-5px);
+.option:hover:not(.disabled) {
+    background: #ffd600;
+    color: #1976d2;
+    transform: scale(1.04);
 }
-
-.option-red { background-color: #e21b3c; }
-.option-blue { background-color: #1368ce; }
-.option-yellow { background-color: #d89e00; }
-.option-green { background-color: #26890c; }
-
-.option-red:hover { background-color: #f13959; }
-.option-blue:hover { background-color: #2980e4; }
-.option-yellow:hover { background-color: #f0b527; }
-.option-green:hover { background-color: #32a818; }
 
 .correct {
-    animation: pulse 1s infinite;
+    background: #43a047 !important;
+    color: #fff !important;
 }
 
 .incorrect {
-    opacity: 0.7;
+    background: #e53935 !important;
+    color: #fff !important;
 }
 
 .disabled {
+    opacity: 0.7;
     pointer-events: none;
+}
+
+#timer-bar {
+    height: 16px;
+    border-radius: 8px;
+    background: #ffd600;
+    margin: 18px 0;
+    transition: width 1s linear;
+}
+
+#countdown-number {
+    color: #1976d2 !important;
+    font-size: 6rem;
+    font-weight: 900;
+    margin-bottom: 0;
+}
+
+button, .option {
+    outline: none;
+}
+
+button {
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 24px;
+    padding: 16px 40px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-top: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+button:hover {
+    background: #ffd600;
+    color: #1976d2;
+    transform: scale(1.04);
+}
+
+#result-message {
+    color: #1976d2;
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 18px 0 8px 0;
+}
+
+#confetti-container {
+    pointer-events: none;
+    position: fixed;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    z-index: 100;
 }
 
 .timer-bar {
@@ -83,4 +208,28 @@ body {
         transform: translateY(100vh) rotate(360deg);
         opacity: 0;
     }
+}
+
+
+#game-screen {
+    position: relative;
+    overflow: hidden;
+}
+
+.crowd-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: 0;
+    opacity: 1;
+    pointer-events: none;
+}
+
+/* O conteúdo do jogo deve ficar acima */
+#game-screen > *:not(.crowd-bg) {
+    position: relative;
+    z-index: 2;
 }
