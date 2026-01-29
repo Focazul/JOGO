@@ -1,3 +1,5 @@
 streamlit
 sqlalchemy
 passlib[bcrypt]
+bcrypt
+pandas
