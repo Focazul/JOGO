@@ -6,7 +6,7 @@ def set_ui_style():
         <style>
         /* Main Background */
         .stApp {
-            background-color: #f4f5f7;
+            background-color: #ffffff;
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
 
