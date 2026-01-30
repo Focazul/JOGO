@@ -4,22 +4,23 @@ def set_ui_style():
     """Sets custom CSS styles for the application."""
     st.markdown("""
         <style>
-        /* Main Background */
+        /* Main Background - Dark Mode */
         .stApp {
-            background-color: #ffffff;
+            background-color: #0e1117;
+            color: #fafafa;
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
 
         /* Sidebar */
         [data-testid="stSidebar"] {
-            background-color: #2c3e50;
+            background-color: #262730;
             color: white;
         }
         [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
-            color: #ecf0f1;
+            color: #ffffff;
         }
         [data-testid="stSidebar"] p, [data-testid="stSidebar"] label, [data-testid="stSidebar"] div {
-            color: #bdc3c7;
+            color: #e0e0e0;
         }
 
         /* Buttons */
@@ -35,24 +36,22 @@ def set_ui_style():
         }
         .stButton>button:hover {
             background-color: #3f3d91;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
-
-        /* Secondary/Action Buttons (if any specific class, otherwise generic override) */
 
         /* Metric Cards */
         [data-testid="stMetric"] {
-            background-color: white;
+            background-color: #1f2937;
             padding: 15px;
             border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             border-left: 5px solid #ff7f50;
         }
         [data-testid="stMetricLabel"] {
-            color: #7f8c8d;
+            color: #d1d5db;
         }
         [data-testid="stMetricValue"] {
-            color: #2c3e50;
+            color: #ffffff;
         }
 
         /* Tabs */
@@ -63,13 +62,13 @@ def set_ui_style():
         .stTabs [data-baseweb="tab"] {
             height: 50px;
             white-space: pre-wrap;
-            background-color: #e0e0e0;
+            background-color: #2d3748;
             border-radius: 5px 5px 0 0;
-            color: #555;
+            color: #a0aec0;
             font-weight: 600;
         }
         .stTabs [aria-selected="true"] {
-            background-color: white;
+            background-color: #0e1117;
             color: #4b49ac;
             border-top: 3px solid #4b49ac;
         }
@@ -77,7 +76,21 @@ def set_ui_style():
         /* Inputs */
         .stTextInput>div>div>input {
             border-radius: 5px;
-            border: 1px solid #ddd;
+            border: 1px solid #4a5568;
+            background-color: #1a202c;
+            color: white;
+        }
+
+        /* Text Color Overrides for General Readability */
+        h1, h2, h3, h4, h5, h6, p, label, span, div {
+            color: #e0e0e0;
+        }
+
+        h1 {
+            border-bottom: 2px solid #ff7f50;
+            padding-bottom: 10px;
+            display: inline-block;
+            color: #ffffff;
         }
 
         /* Progress Bar */
@@ -85,32 +98,22 @@ def set_ui_style():
             background-color: #ff7f50;
         }
 
-        /* Custom Boxes */
+        /* Custom Boxes - Darker variants */
         .success-box {
             padding: 15px;
-            background-color: #d1e7dd;
-            color: #0f5132;
+            background-color: #052c1e;
+            color: #d1e7dd;
             border-radius: 8px;
             border-left: 5px solid #198754;
             margin-bottom: 15px;
         }
         .error-box {
             padding: 15px;
-            background-color: #f8d7da;
-            color: #842029;
+            background-color: #410b10;
+            color: #f8d7da;
             border-radius: 8px;
             border-left: 5px solid #dc3545;
             margin-bottom: 15px;
-        }
-
-        /* Headings */
-        h1, h2, h3 {
-            color: #2c3e50;
-        }
-        h1 {
-            border-bottom: 2px solid #ff7f50;
-            padding-bottom: 10px;
-            display: inline-block;
         }
         </style>
     """, unsafe_allow_html=True)
