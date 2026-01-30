@@ -62,12 +62,32 @@ def quiz_flow():
     if active_phase is None:
         st.success("🎉 Parabéns! Você completou todas as fases disponíveis!")
         st.balloons()
+        # Show Score Summary
+        calculate_and_show_score(user.id)
         return
 
     # Show Quiz for Active Phase
     play_phase(active_phase, qs_by_phase[active_phase], answered_ids)
 
+def calculate_and_show_score(user_id):
+    db = SessionLocal()
+    answers = db.query(Answer).filter(Answer.user_id == user_id, Answer.is_correct == True).all()
+    questions = db.query(Question).filter(Question.id.in_([a.question_id for a in answers])).all()
+    db.close()
+
+    total_points = 0
+    phase_weights = {1: 10, 2: 20, 3: 30, 4: 50}
+
+    for q in questions:
+        total_points += phase_weights.get(q.phase, 10)
+
+    st.info(f"🏆 Pontuação Total Acumulada: {total_points}")
+
 def play_phase(phase_num, questions, answered_ids):
+    # Calculate current score for display
+    # This might be heavy if done every rerun, but acceptable for now.
+    # Ideally we store score in user session or DB user table.
+
     st.header(f"🚀 Fase {phase_num}")
 
     # Filter remaining
