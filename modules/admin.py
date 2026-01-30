@@ -318,11 +318,32 @@ def show_statistics():
     correct_counts.index = ['Incorreto', 'Correto']
     st.bar_chart(correct_counts)
 
-    # Ranking Logic (Simple Score)
-    st.subheader("Ranking (Pontos Totais)")
-    if 'merged' in locals():
-        ranking = merged[merged['is_correct'] == True].groupby('name').count()['id_ans'].sort_values(ascending=False).head(10)
-        st.table(ranking.rename("Acertos"))
+    # Ranking Logic (Points Weighted)
+    st.subheader("Ranking (Pontos Acumulados)")
+
+    # We need to calculate points, which requires joining Question table to get phases
+    # Let's do a more complex query or dataframe merge
+    if not answers_df.empty:
+        # Load Questions to get phases
+        questions_df = pd.read_sql(db.query(Question).statement, db.bind)
+
+        # Merge Answers with Questions
+        # answers_df has 'question_id', questions_df has 'id'
+        full_df = answers_df.merge(questions_df, left_on='question_id', right_on='id', suffixes=('_ans', '_q'))
+
+        # Merge with Users
+        full_df = full_df.merge(users_df, left_on='user_id', right_on='id', suffixes=('_x', '_user'))
+
+        # Filter correct only
+        correct_df = full_df[full_df['is_correct'] == True].copy()
+
+        # Apply weights
+        phase_weights = {1: 10, 2: 20, 3: 30, 4: 50}
+        correct_df['points'] = correct_df['phase'].map(phase_weights).fillna(10)
+
+        # Group by User Name
+        ranking = correct_df.groupby('name')['points'].sum().sort_values(ascending=False).head(10)
+        st.table(ranking)
 
 # --- Tab 5: Usuários ---
 def manage_users():

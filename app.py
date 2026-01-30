@@ -105,6 +105,28 @@ else:
         st.write(f"📧 {st.session_state.user.email}")
         role = "Administrador" if st.session_state.user.role == "master" else "Jogador"
         st.caption(f"Perfil: {role}")
+
+        # Calculate Points on Sidebar
+        from modules.database import SessionLocal, Answer, Question
+        db = SessionLocal()
+        # Join query for speed
+        total_points = 0
+        try:
+            # We can't easily join in raw SQL without aliasing in SQLAlchemy core properly,
+            # but let's do python side for simplicity as user base is small.
+            answers = db.query(Answer).filter(Answer.user_id == st.session_state.user.id, Answer.is_correct == True).all()
+            if answers:
+                q_ids = [a.question_id for a in answers]
+                questions = db.query(Question).filter(Question.id.in_(q_ids)).all()
+                phase_weights = {1: 10, 2: 20, 3: 30, 4: 50}
+                for q in questions:
+                    total_points += phase_weights.get(q.phase, 10)
+        except Exception:
+            pass
+        finally:
+            db.close()
+
+        st.metric("Pontos Totais", total_points)
         st.markdown("---")
 
         menu_options = ["🏠 Início / Quiz"]
